@@ -20,4 +20,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ClientServerTestTask"
-include(":app")
+include(":server")
+include(":client")
+include(":common")
