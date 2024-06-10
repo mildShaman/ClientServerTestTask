@@ -4,8 +4,11 @@ import com.example.clientservertesttask.server.model.DatabaseRepository
 import com.example.common.GestureResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class RoomDatabaseRepository(
+@Singleton
+class RoomDatabaseRepository @Inject constructor(
     database: GestureResultsDatabase
 ): DatabaseRepository {
     private val dao = database.getDao()
