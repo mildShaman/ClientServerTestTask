@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.common.IpAddress
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,29 +18,22 @@ import javax.inject.Singleton
 class DataStoreAppSettings @Inject constructor(
     @ApplicationContext private val context: Context
 ) : AppSettings {
-    val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_NAME)
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_NAME)
 
-    override fun getHost(): Flow<String> {
-        return context.dataStore.data.map {
-            it[HOST_KEY] ?: DEFAULT_HOST
+    override val ipAddress: Flow<IpAddress>
+        get() {
+            return context.dataStore.data.map { preferences ->
+                IpAddress(
+                    host = preferences[HOST_KEY] ?: IpAddress.DEFAULT.host,
+                    port = preferences[PORT_KEY] ?: IpAddress.DEFAULT.port
+                )
+            }
         }
-    }
 
-    override fun getPort(): Flow<Int> {
-        return context.dataStore.data.map {
-            it[PORT_KEY] ?: DEFAULT_PORT
-        }
-    }
-
-    override suspend fun setHost(host: String) {
+    override suspend fun setAddress(address: IpAddress) {
         context.dataStore.edit {
-            it[HOST_KEY] = host
-        }
-    }
-
-    override suspend fun setPort(port: Int) {
-        context.dataStore.edit {
-            it[PORT_KEY] = port
+            it[HOST_KEY] = address.host
+            it[PORT_KEY] = address.port
         }
     }
 
@@ -48,8 +42,5 @@ class DataStoreAppSettings @Inject constructor(
 
         val HOST_KEY = stringPreferencesKey("host")
         val PORT_KEY = intPreferencesKey("port")
-
-        const val DEFAULT_HOST = "0.0.0.0"
-        const val DEFAULT_PORT = 8080
     }
 }

@@ -44,10 +44,14 @@ fun SettingsScreen(
     val context = LocalContext.current
     
     val ipAddress = viewModel.ipAddress.collectAsStateWithLifecycle()
-    var hostText by remember {
+    var hostText by remember(
+        ipAddress.value
+    ) {
         mutableStateOf(ipAddress.value.host)
     }
-    var portText by remember {
+    var portText by remember(
+        ipAddress.value
+    ) {
         mutableStateOf(ipAddress.value.port.toString())
     }
     var hostErrorMessage by remember {

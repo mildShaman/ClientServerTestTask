@@ -1,13 +1,10 @@
 package com.example.clientservertesttask.server.model.settings
 
+import com.example.common.IpAddress
 import kotlinx.coroutines.flow.Flow
 
 interface AppSettings {
-    fun getHost(): Flow<String>
+    val ipAddress: Flow<IpAddress>
 
-    fun getPort(): Flow<Int>
-
-    suspend fun setHost(host: String)
-
-    suspend fun setPort(port: Int)
+    suspend fun setAddress(address: IpAddress)
 }
