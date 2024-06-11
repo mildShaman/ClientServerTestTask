@@ -11,4 +11,11 @@
     <string name="invalid_host_address">Invalid host address</string>
     <string name="enter_a_host">Enter a host</string>
     <string name="invalid_port">Invalid port</string>
+    <string name="start_time_prefix">"start time: "</string>
+    <string name="cd_expand_log_item">Expand log item</string>
+    <string name="end_time_prefix">"end time: "</string>
+    <string name="start_x_prefix">"start x: "</string>
+    <string name="start_y_prefix">"start y: "</string>
+    <string name="distance_x_prefix">"distance x: "</string>
+    <string name="distance_y_prefix">"distance y: "</string>
 </resources>

@@ -36,7 +36,12 @@ fun ServerNavHost(modifier: Modifier = Modifier) {
             )
         }
         composable(Destination.Logs.route) {
-            LogsScreen(modifier)
+            LogsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                modifier = modifier
+            )
         }
     }
 }
