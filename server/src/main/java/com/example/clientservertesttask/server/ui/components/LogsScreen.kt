@@ -66,9 +66,13 @@ fun LogsScreen(
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier.padding(paddingValues)
+                .fillMaxSize()
         ) {
             items(logs.value) {
-                LogItem(it)
+                LogItem(
+                    data = it,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }

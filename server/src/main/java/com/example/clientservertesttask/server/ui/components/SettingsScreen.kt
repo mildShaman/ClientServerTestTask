@@ -83,6 +83,7 @@ fun SettingsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .padding(paddingValues)
+                .fillMaxSize()
                 .padding(16.dp)
         ) {
             Text(text = stringResource(R.string.host))
