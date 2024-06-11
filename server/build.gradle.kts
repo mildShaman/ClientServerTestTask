@@ -46,7 +46,11 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += setOf(
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "/META-INF/INDEX.LIST",
+                "/META-INF/io.netty.versions.properties"
+            )
         }
     }
 }
@@ -63,6 +67,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    implementation(libs.androidx.datastore.preferences)
+
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
@@ -73,7 +79,6 @@ dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.websockets)
-    implementation(libs.ktor.gson)
     implementation(libs.ktor.serialization.kotlinx.json)
 
     testImplementation(libs.junit)
