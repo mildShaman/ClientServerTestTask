@@ -28,7 +28,12 @@ fun ServerNavHost(modifier: Modifier = Modifier) {
             )
         }
         composable(Destination.Settings.route) {
-            SettingsScreen(modifier)
+            SettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                modifier = modifier
+            )
         }
         composable(Destination.Logs.route) {
             LogsScreen(modifier)

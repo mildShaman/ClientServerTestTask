@@ -4,4 +4,11 @@
     <string name="start">Start</string>
     <string name="config">Config</string>
     <string name="logs">Logs</string>
+    <string name="cd_navigate_back">Navigate back</string>
+    <string name="host">Host</string>
+    <string name="port">Port</string>
+    <string name="save">Save</string>
+    <string name="invalid_host_address">Invalid host address</string>
+    <string name="enter_a_host">Enter a host</string>
+    <string name="invalid_port">Invalid port</string>
 </resources>
