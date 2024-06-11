@@ -20,7 +20,12 @@ fun ServerNavHost(modifier: Modifier = Modifier) {
 
     NavHost(navController = navController, startDestination = Destination.Main.route) {
         composable(Destination.Main.route) {
-            MainScreen(modifier)
+            MainScreen(
+                onNavigate = {
+                     navController.navigate(it.route)
+                },
+                modifier = modifier
+            )
         }
         composable(Destination.Settings.route) {
             SettingsScreen(modifier)
