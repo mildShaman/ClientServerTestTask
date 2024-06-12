@@ -50,7 +50,7 @@ fun LogsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.config))
+                    Text(text = stringResource(id = R.string.logs))
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -65,7 +65,8 @@ fun LogsScreen(
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .padding(paddingValues)
                 .fillMaxSize()
         ) {
             items(logs.value) {
@@ -90,7 +91,7 @@ fun LogItem(
 
     Card(
         onClick = { expanded = !expanded },
-        modifier = modifier.padding(8.dp)
+        modifier = modifier.padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier
