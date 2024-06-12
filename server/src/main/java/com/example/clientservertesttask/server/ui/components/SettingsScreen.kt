@@ -137,7 +137,7 @@ fun SettingsScreen(
                         if (hostText.isEmpty()) {
                             isInputValid = false
                             hostErrorMessage = context.getString(R.string.enter_a_host)
-                        } else if (!Patterns.IP_ADDRESS.matcher(hostText).matches()) {
+                        } else if (!(Patterns.IP_ADDRESS.matcher(hostText).matches() || hostText == "0.0.0.0")) {
                             isInputValid = false
                             hostErrorMessage = context.getString(R.string.invalid_host_address)
                         }
