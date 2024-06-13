@@ -5,7 +5,13 @@ import com.example.common.GestureResult
 import kotlinx.coroutines.flow.Flow
 
 interface Client {
-    val gesture: Flow<Gesture>
+    val isActive: Flow<Boolean>
+
+    suspend fun connect()
+
+    suspend fun receiveGesture(onReceive: (Gesture) -> Unit)
 
     suspend fun sendGestureResult(gestureResult: GestureResult)
+
+    suspend fun disconnect()
 }

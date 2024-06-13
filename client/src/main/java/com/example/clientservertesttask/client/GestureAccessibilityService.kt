@@ -5,6 +5,7 @@ import android.accessibilityservice.GestureDescription
 import android.graphics.Path
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import com.example.clientservertesttask.client.model.Client
 import com.example.common.Gesture
 import com.example.common.GestureResult
@@ -16,18 +17,25 @@ import kotlinx.coroutines.launch
 object GestureAccessibilityService: AccessibilityService() {
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
-    private val mainScope = CoroutineScope(Dispatchers.Main + job)
+    private val mainScope = CoroutineScope(AndroidUiDispatcher.Main + job)
 
     private lateinit var client: Client
+    private var isClientActive = false
+
     private var gesture: Gesture? = null
 
     init {
         scope.launch {
-            client.gesture.collect {
+            client.isActive.collect {
+                isClientActive = it
+            }
+        }
+        scope.launch {
+            client.receiveGesture {
                 gesture = it
                 mainScope.launch {
                     super.dispatchGesture(
-                        createGestureDescription(gesture!!), null, null
+                        createGestureDescription(it), null, null
                     )
                 }
             }
@@ -60,21 +68,19 @@ object GestureAccessibilityService: AccessibilityService() {
                 AccessibilityEvent.TYPE_GESTURE_DETECTION_START -> {
                     startTime = event.eventTime
                 }
-
                 AccessibilityEvent.TYPE_GESTURE_DETECTION_END -> {
                     endTime = event.eventTime
-                    if (gesture != null && startTime != null) {
+                    if (gesture != null && startTime != null && isClientActive) {
                         scope.launch {
                             client.sendGestureResult(
                                 GestureResult(gesture!!, startTime!!, endTime!!)
                             )
                         }
                     } else {
-                        Log.w(TAG, "end time received, but missing gesture data")
+                        Log.w(TAG, "end time received, but cannot send response")
                     }
                 }
-
-                else -> { /*nothing to do*/ }
+                else -> { }
             }
         }
     }
