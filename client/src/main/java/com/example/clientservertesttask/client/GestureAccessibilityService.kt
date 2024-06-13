@@ -6,14 +6,17 @@ import android.view.accessibility.AccessibilityEvent
 import com.example.clientservertesttask.client.model.Client
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 object GestureAccessibilityService: AccessibilityService() {
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.IO + job)
+
     private lateinit var client: Client
-    var startTime: Long? = null
-        private set
-    var endTime: Long? = null
-        private set
+
+    private var startTime: Long? = null
+    private var endTime: Long? = null
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event != null) {
@@ -25,7 +28,7 @@ object GestureAccessibilityService: AccessibilityService() {
                 AccessibilityEvent.TYPE_GESTURE_DETECTION_END -> {
                     endTime = event.eventTime
                     if (startTime != null) {
-                        CoroutineScope(Dispatchers.IO).launch {
+                        scope.launch {
                             client.sendGestureTime(startTime!!, endTime!!)
                         }
                     } else {
@@ -40,6 +43,11 @@ object GestureAccessibilityService: AccessibilityService() {
 
     override fun onInterrupt() {
         Log.w(TAG, "service interrupted")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
     }
 
     private const val TAG = "GestureAccessibilityService"

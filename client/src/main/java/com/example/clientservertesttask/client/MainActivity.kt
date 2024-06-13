@@ -1,6 +1,5 @@
 package com.example.clientservertesttask.client
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,8 +9,6 @@ import com.example.clientservertesttask.client.ui.theme.ClientServerTestTaskThem
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        startService(Intent(applicationContext, GestureAccessibilityService::class.java))
 
         enableEdgeToEdge()
         setContent {
