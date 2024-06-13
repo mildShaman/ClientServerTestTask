@@ -2,9 +2,10 @@ package com.example.clientservertesttask.client.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.clientservertesttask.client.model.client.Client
+import com.example.common.BrowserOpenEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -29,6 +30,14 @@ class MainViewModel @Inject constructor(
         if (!_isClientActive.value) {
             viewModelScope.launch {
                 client.connect()
+            }
+        }
+    }
+
+    fun onBrowserOpen(time: Long) {
+        if (_isClientActive.value) {
+            viewModelScope.launch((Dispatchers.IO)) {
+                client.sendBrowserOpenEvent(BrowserOpenEvent(time, true))
             }
         }
     }

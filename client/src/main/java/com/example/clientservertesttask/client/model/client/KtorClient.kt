@@ -1,10 +1,12 @@
 package com.example.clientservertesttask.client.model.client
 
 import com.example.clientservertesttask.client.model.settings.AppSettings
+import com.example.common.BrowserOpenEvent
 import com.example.common.Gesture
 import com.example.common.GestureResult
 import com.example.common.IpAddress
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.receiveDeserialized
@@ -31,7 +33,7 @@ class KtorClient @Inject constructor(
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
-    private val client = HttpClient {
+    private val client = HttpClient(CIO) {
         install(WebSockets) {
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
         }
@@ -68,8 +70,14 @@ class KtorClient @Inject constructor(
         initSession(ipAddress)
     }
 
+    override suspend fun sendBrowserOpenEvent(browserOpenEvent: BrowserOpenEvent) {
+        if (_isActive.value) {
+            session.sendSerialized(browserOpenEvent)
+        }
+    }
+
     override suspend fun receiveGesture(onReceive: (Gesture) -> Unit) {
-        while (session.isActive) {
+        while (_isActive.value) {
             val gesture = session.receiveDeserialized<Gesture>()
             onReceive(gesture)
         }

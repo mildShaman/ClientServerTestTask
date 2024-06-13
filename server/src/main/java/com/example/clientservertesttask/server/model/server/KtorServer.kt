@@ -3,19 +3,14 @@ package com.example.clientservertesttask.server.model.server
 import com.example.clientservertesttask.server.model.DatabaseRepository
 import com.example.clientservertesttask.server.model.gestrues.GesturesRepository
 import com.example.clientservertesttask.server.model.settings.AppSettings
-import com.example.common.BrowserOpenMessage
-import com.example.common.Gesture
+import com.example.common.BrowserOpenEvent
 import com.example.common.GestureResult
 import com.example.common.IpAddress
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
-import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.server.response.respond
-import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSocketServerSession
 import io.ktor.server.websocket.WebSockets
@@ -70,9 +65,9 @@ class KtorServer @Inject constructor(
                     sessions.add(this)
 
                     for (session in sessions) {
-                        val browserOpenMessage = receiveDeserialized<BrowserOpenMessage>()
+                        val browserOpenEvent = receiveDeserialized<BrowserOpenEvent>()
 
-                        if (browserOpenMessage.isOpen) {
+                        if (browserOpenEvent.isOpen) {
                             for (gesture in gestures) {
                                 sendSerialized(gesture)
                                 val gestureResult = receiveDeserialized<GestureResult>()
