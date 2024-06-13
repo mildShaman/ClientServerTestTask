@@ -4,8 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Gesture(
-    val startX: Int,
-    val startY: Int,
-    val distanceX: Float,
-    val distanceY: Float
+    val startX: Float,
+    val startY: Float,
+    val endX: Float,
+    val endY: Float,
+    val duration: Long
 )

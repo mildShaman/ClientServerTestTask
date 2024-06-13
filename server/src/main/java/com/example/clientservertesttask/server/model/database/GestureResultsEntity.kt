@@ -9,16 +9,17 @@ import com.example.common.GestureResult
 @Entity(tableName = "gesture_results")
 data class GestureResultsEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
-    @ColumnInfo(name = "start_x") val startX: Int,
-    @ColumnInfo(name = "start_y") val startY: Int,
-    @ColumnInfo(name = "distance_x") val distanceX: Float,
-    @ColumnInfo(name = "distance_y") val distanceY: Float,
+    @ColumnInfo(name = "start_x") val startX: Float,
+    @ColumnInfo(name = "start_y") val startY: Float,
+    @ColumnInfo(name = "end_x") val endX: Float,
+    @ColumnInfo(name = "end_y") val endY: Float,
+    val duration: Long,
     @ColumnInfo(name = "start_time") val startTime: Long,
     @ColumnInfo(name = "end_time") val endTime: Long
 ) {
     fun toGestureResult() = GestureResult(
         gestureData = Gesture(
-            startX, startY, distanceX, distanceY
+            startX, startY, endX, endY, duration
         ),
         startTime, endTime
     )
@@ -28,8 +29,9 @@ data class GestureResultsEntity(
             id = 0,
             startX = result.gestureData.startX,
             startY = result.gestureData.startY,
-            distanceX = result.gestureData.distanceX,
-            distanceY = result.gestureData.distanceY,
+            endX = result.gestureData.endX,
+            endY = result.gestureData.endY,
+            duration = result.gestureData.duration,
             startTime = result.startTime,
             endTime = result.endTime
         )

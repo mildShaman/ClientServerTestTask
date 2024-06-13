@@ -116,10 +116,13 @@ fun LogItem(
                             text = stringResource(R.string.start_y_prefix) + "${data.gestureData.startY}"
                         )
                         Text(
-                            text = stringResource(R.string.distance_x_prefix) + "${data.gestureData.distanceX}"
+                            text = stringResource(R.string.end_x_prefix) + "${data.gestureData.endX}"
                         )
                         Text(
-                            text = stringResource(R.string.distance_y_prefix) + "${data.gestureData.distanceY}"
+                            text = stringResource(R.string.end_y_prefix) + "${data.gestureData.endY}"
+                        )
+                        Text(
+                            text = stringResource(R.string.duration_ms_prefix) + "${data.gestureData.duration}"
                         )
                     }
                 }
@@ -142,10 +145,11 @@ private fun LogItemPreview() {
     ClientServerTestTaskTheme {
         LogItem(data = GestureResult(
             gestureData = Gesture(
-                startX = 50,
-                startY = 60,
-                distanceX = .5f,
-                distanceY = .6f
+                startX = 50f,
+                startY = 60f,
+                endX = 50f,
+                endY = 260f,
+                duration = 500
             ),
             startTime = 1000,
             endTime = 1100

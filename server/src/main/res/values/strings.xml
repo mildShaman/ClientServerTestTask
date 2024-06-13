@@ -18,4 +18,7 @@
     <string name="start_y_prefix">"start y: "</string>
     <string name="distance_x_prefix">"distance x: "</string>
     <string name="distance_y_prefix">"distance y: "</string>
+    <string name="end_y_prefix">"end y: "</string>
+    <string name="end_x_prefix">"end x: "</string>
+    <string name="duration_ms_prefix">"duration ms: "</string>
 </resources>

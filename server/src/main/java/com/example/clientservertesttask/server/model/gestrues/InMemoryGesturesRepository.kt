@@ -8,8 +8,8 @@ import javax.inject.Singleton
 class InMemoryGesturesRepository @Inject constructor(): GesturesRepository {
     override fun getGestures(): List<Gesture> {
         return listOf(
-            Gesture(50, 50, 0f, .5f),
-            Gesture(50, 50, .5f, 0f),
+            Gesture(50f, 50f, 200f, 50f, 500),
+            Gesture(50f, 50f, 50f, 200f, 600),
         )
     }
 }
