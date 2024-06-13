@@ -6,7 +6,7 @@ import android.graphics.Path
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.compose.ui.platform.AndroidUiDispatcher
-import com.example.clientservertesttask.client.model.Client
+import com.example.clientservertesttask.client.model.client.Client
 import com.example.common.Gesture
 import com.example.common.GestureResult
 import dagger.hilt.android.AndroidEntryPoint

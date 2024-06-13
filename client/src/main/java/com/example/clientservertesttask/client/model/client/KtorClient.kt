@@ -1,4 +1,4 @@
-package com.example.clientservertesttask.client.model
+package com.example.clientservertesttask.client.model.client
 
 import com.example.common.Gesture
 import com.example.common.GestureResult

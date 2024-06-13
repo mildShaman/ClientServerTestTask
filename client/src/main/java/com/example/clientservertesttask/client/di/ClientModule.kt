@@ -1,7 +1,7 @@
 package com.example.clientservertesttask.client.di
 
-import com.example.clientservertesttask.client.model.Client
-import com.example.clientservertesttask.client.model.KtorClient
+import com.example.clientservertesttask.client.model.client.Client
+import com.example.clientservertesttask.client.model.client.KtorClient
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
