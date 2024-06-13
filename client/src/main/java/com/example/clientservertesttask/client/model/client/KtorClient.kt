@@ -1,5 +1,6 @@
 package com.example.clientservertesttask.client.model.client
 
+import com.example.clientservertesttask.client.model.settings.AppSettings
 import com.example.common.Gesture
 import com.example.common.GestureResult
 import com.example.common.IpAddress
@@ -17,19 +18,32 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class KtorClient @Inject constructor(): Client {
+class KtorClient @Inject constructor(
+    private val settings: AppSettings
+): Client {
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
     private val client = HttpClient {
         install(WebSockets) {
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
+        }
+    }
+
+    private var ipAddress = IpAddress.DEFAULT
+
+    init {
+        scope.launch {
+            settings.ipAddress.collect {
+                ipAddress = it
+            }
         }
     }
 
@@ -51,7 +65,7 @@ class KtorClient @Inject constructor(): Client {
     }
 
     override suspend fun connect() {
-        initSession(IpAddress.DEFAULT)
+        initSession(ipAddress)
     }
 
     override suspend fun receiveGesture(onReceive: (Gesture) -> Unit) {
