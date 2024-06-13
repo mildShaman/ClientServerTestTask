@@ -1,5 +1,6 @@
 package com.example.clientservertesttask.server.model.server
 
+import android.util.Log
 import com.example.clientservertesttask.server.model.DatabaseRepository
 import com.example.clientservertesttask.server.model.gestrues.GesturesRepository
 import com.example.clientservertesttask.server.model.settings.AppSettings
@@ -66,10 +67,12 @@ class KtorServer @Inject constructor(
 
                     for (session in sessions) {
                         val browserOpenEvent = receiveDeserialized<BrowserOpenEvent>()
+                        Log.d("KtorServer", "$browserOpenEvent received")
 
                         if (browserOpenEvent.isOpen) {
                             for (gesture in gestures) {
                                 sendSerialized(gesture)
+                                Log.d("KtorServer", "$gesture sent")
                                 val gestureResult = receiveDeserialized<GestureResult>()
                                 databaseRepository.addGestureResult(gestureResult)
                             }

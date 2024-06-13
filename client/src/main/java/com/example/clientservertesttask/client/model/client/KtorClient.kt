@@ -1,5 +1,6 @@
 package com.example.clientservertesttask.client.model.client
 
+import android.util.Log
 import com.example.clientservertesttask.client.model.settings.AppSettings
 import com.example.common.BrowserOpenEvent
 import com.example.common.Gesture
@@ -51,7 +52,7 @@ class KtorClient @Inject constructor(
 
     private lateinit var session: DefaultClientWebSocketSession
 
-    private val _isActive= MutableStateFlow(false)
+    private val _isActive = MutableStateFlow(false)
     override val isActive: Flow<Boolean>
         get() = _isActive
 
@@ -71,25 +72,33 @@ class KtorClient @Inject constructor(
     }
 
     override suspend fun sendBrowserOpenEvent(browserOpenEvent: BrowserOpenEvent) {
+        Log.d(TAG, "sendBrowserOpenEvent isActive = ${_isActive.value}")
         if (_isActive.value) {
             session.sendSerialized(browserOpenEvent)
+            Log.d(TAG, "$browserOpenEvent sent")
         }
     }
 
     override suspend fun receiveGesture(onReceive: (Gesture) -> Unit) {
         while (_isActive.value) {
             val gesture = session.receiveDeserialized<Gesture>()
+            Log.d(TAG, "$gesture received")
             onReceive(gesture)
         }
     }
 
     override suspend fun sendGestureResult(gestureResult: GestureResult) {
         session.sendSerialized(gestureResult)
+        Log.d(TAG, "$gestureResult sent")
     }
 
     override suspend fun disconnect() {
         _isActive.value = false
         job.cancel()
         session.close()
+    }
+
+    companion object {
+        const val TAG = "KtorClient"
     }
 }

@@ -28,7 +28,9 @@ class GestureAccessibilityService: AccessibilityService() {
 
     private var gesture: Gesture? = null
 
-    init {
+    override fun onServiceConnected() {
+        super.onServiceConnected()
+
         scope.launch {
             client.isActive.collect {
                 isClientActive = it

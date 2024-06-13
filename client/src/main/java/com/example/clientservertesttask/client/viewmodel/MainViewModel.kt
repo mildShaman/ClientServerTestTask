@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val client: Client
-): ViewModel() {
+) : ViewModel() {
     private val _isClientActive = MutableStateFlow(false)
     val isClientActive: StateFlow<Boolean> = _isClientActive
 
@@ -35,18 +35,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun onBrowserOpen(time: Long) {
-        if (_isClientActive.value) {
-            viewModelScope.launch((Dispatchers.IO)) {
-                client.sendBrowserOpenEvent(BrowserOpenEvent(time, true))
-            }
+        viewModelScope.launch((Dispatchers.IO)) {
+            client.sendBrowserOpenEvent(BrowserOpenEvent(time, true))
         }
     }
 
     fun disconnectFromServer() {
-        if (_isClientActive.value) {
-            viewModelScope.launch {
-                client.disconnect()
-            }
+        viewModelScope.launch {
+            client.disconnect()
         }
     }
 }
