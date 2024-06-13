@@ -9,17 +9,21 @@ import androidx.compose.ui.platform.AndroidUiDispatcher
 import com.example.clientservertesttask.client.model.Client
 import com.example.common.Gesture
 import com.example.common.GestureResult
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-object GestureAccessibilityService: AccessibilityService() {
+@AndroidEntryPoint
+class GestureAccessibilityService: AccessibilityService() {
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
     private val mainScope = CoroutineScope(AndroidUiDispatcher.Main + job)
 
-    private lateinit var client: Client
+    @Inject
+    lateinit var client: Client
     private var isClientActive = false
 
     private var gesture: Gesture? = null
@@ -94,5 +98,7 @@ object GestureAccessibilityService: AccessibilityService() {
         job.cancel()
     }
 
-    private const val TAG = "GestureAccessibilityService"
+    companion object {
+        const val TAG = "GestureAccessibilityService"
+    }
 }
