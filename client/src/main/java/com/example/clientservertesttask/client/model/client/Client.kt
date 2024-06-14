@@ -7,12 +7,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface Client {
     val isActive: Flow<Boolean>
+    val gesture: Flow<Gesture>
 
     suspend fun connect()
 
     suspend fun sendBrowserOpenEvent(browserOpenEvent: BrowserOpenEvent)
-
-    suspend fun receiveGesture(onReceive: (Gesture) -> Unit)
 
     suspend fun sendGestureResult(gestureResult: GestureResult)
 

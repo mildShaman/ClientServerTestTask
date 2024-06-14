@@ -24,27 +24,33 @@ class GestureAccessibilityService: AccessibilityService() {
 
     @Inject
     lateinit var client: Client
-    private var isClientActive = false
-
-    private var gesture: Gesture? = null
 
     override fun onServiceConnected() {
-        super.onServiceConnected()
-
         scope.launch {
-            client.isActive.collect {
-                isClientActive = it
+            client.gesture.collect { gesture ->
+                performGesture(gesture)
             }
         }
-        scope.launch {
-            client.receiveGesture {
-                gesture = it
-                mainScope.launch {
-                    super.dispatchGesture(
-                        createGestureDescription(it), null, null
-                    )
-                }
-            }
+    }
+
+    private fun performGesture(gesture: Gesture) {
+        mainScope.launch {
+            val startTime = System.currentTimeMillis()
+            super.dispatchGesture(
+                createGestureDescription(gesture),
+                object: GestureResultCallback() {
+                    override fun onCompleted(gestureDescription: GestureDescription?) {
+                        val endTime = System.currentTimeMillis()
+                        scope.launch {
+                            client.sendGestureResult(
+                                GestureResult(gesture, startTime, endTime)
+                            )
+                        }
+                    }
+                },
+                null
+            )
+            Log.d(TAG, "$gesture dispatched")
         }
     }
 
@@ -59,37 +65,13 @@ class GestureAccessibilityService: AccessibilityService() {
     }
 
     private fun createPath(gesture: Gesture): Path {
-        val path = Path()
-        path.moveTo(gesture.startX, gesture.startY)
-        path.lineTo(gesture.endX, gesture.endY)
-        return path
-    }
-
-    private var startTime: Long? = null
-    private var endTime: Long? = null
-
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        if (event != null) {
-            when (event.eventType) {
-                AccessibilityEvent.TYPE_GESTURE_DETECTION_START -> {
-                    startTime = event.eventTime
-                }
-                AccessibilityEvent.TYPE_GESTURE_DETECTION_END -> {
-                    endTime = event.eventTime
-                    if (gesture != null && startTime != null && isClientActive) {
-                        scope.launch {
-                            client.sendGestureResult(
-                                GestureResult(gesture!!, startTime!!, endTime!!)
-                            )
-                        }
-                    } else {
-                        Log.w(TAG, "end time received, but cannot send response")
-                    }
-                }
-                else -> { }
-            }
+        return Path().apply {
+            moveTo(gesture.startX, gesture.startY)
+            lineTo(gesture.endX, gesture.endY)
         }
     }
+
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) { }
 
     override fun onInterrupt() {
         Log.w(TAG, "service interrupted")

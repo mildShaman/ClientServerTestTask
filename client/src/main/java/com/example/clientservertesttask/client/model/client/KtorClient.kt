@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -56,6 +57,10 @@ class KtorClient @Inject constructor(
     override val isActive: Flow<Boolean>
         get() = _isActive
 
+    private val _gesture = MutableSharedFlow<Gesture>()
+    override val gesture: Flow<Gesture>
+        get() = _gesture
+
     private fun initSession(ipAddress: IpAddress) {
         session = runBlocking {
             client.webSocketSession(
@@ -65,6 +70,13 @@ class KtorClient @Inject constructor(
             )
         }
         _isActive.value = session.isActive
+        scope.launch {
+            while (session.isActive) {
+                val gesture = session.receiveDeserialized<Gesture>()
+                Log.d(TAG, "$gesture received")
+                _gesture.emit(gesture)
+            }
+        }
     }
 
     override suspend fun connect() {
@@ -72,18 +84,9 @@ class KtorClient @Inject constructor(
     }
 
     override suspend fun sendBrowserOpenEvent(browserOpenEvent: BrowserOpenEvent) {
-        Log.d(TAG, "sendBrowserOpenEvent isActive = ${_isActive.value}")
         if (_isActive.value) {
             session.sendSerialized(browserOpenEvent)
             Log.d(TAG, "$browserOpenEvent sent")
-        }
-    }
-
-    override suspend fun receiveGesture(onReceive: (Gesture) -> Unit) {
-        while (_isActive.value) {
-            val gesture = session.receiveDeserialized<Gesture>()
-            Log.d(TAG, "$gesture received")
-            onReceive(gesture)
         }
     }
 
