@@ -33,7 +33,7 @@ class GestureAccessibilityService: AccessibilityService() {
         }
     }
 
-    private fun performGesture(gesture: Gesture) {
+    private suspend fun performGesture(gesture: Gesture) {
         mainScope.launch {
             val startTime = System.currentTimeMillis()
             super.dispatchGesture(
