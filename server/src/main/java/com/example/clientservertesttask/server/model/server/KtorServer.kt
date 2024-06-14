@@ -20,6 +20,7 @@ import io.ktor.server.websocket.sendSerialized
 import io.ktor.server.websocket.webSocket
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -35,12 +36,15 @@ class KtorServer @Inject constructor(
     private val databaseRepository: DatabaseRepository,
     gesturesRepository: GesturesRepository
 ): Server {
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.IO + job)
+
     private val ipAddress = MutableStateFlow(IpAddress.DEFAULT)
     private val _isStarted = MutableStateFlow(false)
     private val gestures = gesturesRepository.getGestures()
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
+        scope.launch {
             settings.ipAddress.collect {
                 ipAddress.value = it
             }
@@ -96,7 +100,12 @@ class KtorServer @Inject constructor(
 
     override suspend fun stop() {
         if (_isStarted.value) {
-            server.stop()
+            try {
+                job.cancel()
+                server.stop()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
         _isStarted.value = false
     }

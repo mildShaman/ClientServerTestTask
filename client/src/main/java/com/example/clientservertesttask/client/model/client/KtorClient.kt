@@ -80,7 +80,11 @@ class KtorClient @Inject constructor(
     }
 
     override suspend fun connect() {
-        initSession(ipAddress)
+        try {
+            initSession(ipAddress)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override suspend fun sendBrowserOpenEvent(browserOpenEvent: BrowserOpenEvent) {
@@ -96,9 +100,13 @@ class KtorClient @Inject constructor(
     }
 
     override suspend fun disconnect() {
-        _isActive.value = false
-        job.cancel()
-        session.close()
+        try {
+            _isActive.value = false
+            job.cancel()
+            session.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     companion object {
