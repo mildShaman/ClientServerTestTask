@@ -18,6 +18,7 @@ import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.receiveDeserialized
 import io.ktor.server.websocket.sendSerialized
 import io.ktor.server.websocket.webSocket
+import io.ktor.websocket.close
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -35,7 +36,7 @@ class KtorServer @Inject constructor(
     private val settings: AppSettings,
     private val databaseRepository: DatabaseRepository,
     gesturesRepository: GesturesRepository
-): Server {
+) : Server {
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
@@ -52,6 +53,7 @@ class KtorServer @Inject constructor(
     }
 
     private var server = initServer(ipAddress.value.host, ipAddress.value.port)
+    private val sessions = Collections.synchronizedList<WebSocketServerSession>(ArrayList())
 
     private fun initServer(host: String, port: Int): ApplicationEngine {
         return embeddedServer(
@@ -64,24 +66,26 @@ class KtorServer @Inject constructor(
             }
 
             routing {
-                val sessions = Collections.synchronizedList<WebSocketServerSession>(ArrayList())
+                try {
+                    webSocket("/") {
+                        sessions.add(this)
 
-                webSocket("/") {
-                    sessions.add(this)
+                        for (session in sessions) {
+                            val browserOpenEvent = receiveDeserialized<BrowserOpenEvent>()
+                            Log.d("KtorServer", "$browserOpenEvent received")
 
-                    for (session in sessions) {
-                        val browserOpenEvent = receiveDeserialized<BrowserOpenEvent>()
-                        Log.d("KtorServer", "$browserOpenEvent received")
-
-                        if (browserOpenEvent.isOpen) {
-                            for (gesture in gestures) {
-                                sendSerialized(gesture)
-                                Log.d("KtorServer", "$gesture sent")
-                                val gestureResult = receiveDeserialized<GestureResult>()
-                                databaseRepository.addGestureResult(gestureResult)
+                            if (browserOpenEvent.isOpen) {
+                                for (gesture in gestures) {
+                                    sendSerialized(gesture)
+                                    Log.d("KtorServer", "$gesture sent")
+                                    val gestureResult = receiveDeserialized<GestureResult>()
+                                    databaseRepository.addGestureResult(gestureResult)
+                                }
                             }
                         }
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
         }
@@ -100,13 +104,19 @@ class KtorServer @Inject constructor(
 
     override suspend fun stop() {
         if (_isStarted.value) {
-            try {
-                job.cancel()
-                server.stop()
-            } catch (e: Exception) {
-                e.printStackTrace()
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    sessions.forEach {
+                        it.close()
+                    }
+                    job.cancel()
+                    server.stop()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    _isStarted.value = false
+                }
             }
         }
-        _isStarted.value = false
     }
 }
