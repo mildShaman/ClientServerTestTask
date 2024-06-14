@@ -18,6 +18,7 @@ import io.ktor.websocket.close
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,11 +71,18 @@ class KtorClient @Inject constructor(
             )
         }
         _isActive.value = session.isActive
-        scope.launch {
-            while (session.isActive) {
-                val gesture = session.receiveDeserialized<Gesture>()
-                Log.d(TAG, "$gesture received")
-                _gesture.emit(gesture)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                while (session.isActive) {
+                    val gesture = session.receiveDeserialized<Gesture>()
+                    Log.d(TAG, "$gesture received")
+                    _gesture.emit(gesture)
+                }
+            } catch (e: Exception) {
+                if (e is ClosedReceiveChannelException) {
+                    disconnect()
+                }
+                e.printStackTrace()
             }
         }
     }
